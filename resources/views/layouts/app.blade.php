@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="theme-color" content="#08080A">
+
+    <title>@yield('title', 'Dashboard') · {{ config('app.name', 'RentManager') }}</title>
+
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2322C55E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/%3E%3Cpath d='M9 22V12h6v10'/%3E%3C/svg%3E">
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @livewireStyles
+    @stack('head')
+</head>
+<body class="min-h-screen bg-[#08080A] text-white antialiased font-sans">
+
+    <div class="flex min-h-screen mesh-bg">
+        @include('layouts.partials.sidebar')
+
+        <div class="flex-1 flex flex-col min-w-0 lg:ml-72">
+            @include('layouts.partials.topbar')
+
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 page-enter">
+                {{ $slot }}
+            </main>
+        </div>
+    </div>
+
+    @include('components.ui.toast')
+    @livewire('modal-portal')
+
+    @stack('modals')
+    @livewireScripts
+
+    <script>
+        const renderLucide = () => window.lucide.createIcons({ icons: window.lucide.icons });
+        document.addEventListener('DOMContentLoaded', renderLucide);
+        document.addEventListener('livewire:navigated', renderLucide);
+        document.addEventListener('livewire:init', () => {
+            window.Livewire.hook('morph.updated', renderLucide);
+            window.Livewire.hook('element.init', renderLucide);
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                window.dispatchEvent(new CustomEvent('open-command-palette'));
+            }
+        });
+    </script>
+</body>
+</html>
